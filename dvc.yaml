@@ -1,0 +1,102 @@
+stages:
+
+  # ------------------------------------------------------------------ #
+  # Stage 1 – Download data and build clean manifest                    #
+  # ------------------------------------------------------------------ #
+  download:
+    foreach: ${languages}
+    do:
+      cmd: python src/download_data.py --lang ${item} --params params.yaml
+      deps:
+        - src/download_data.py
+        - params.yaml
+      params:
+        - languages
+        - data
+        - model.target_sr
+      outs:
+        - data/manifests/${item}/clean.jsonl
+
+  # ------------------------------------------------------------------ #
+  # Stage 2 – Phonemize reference transcriptions                        #
+  # ------------------------------------------------------------------ #
+  phonemize:
+    foreach: ${languages}
+    do:
+      cmd: python src/phonemize.py --lang ${item} --params params.yaml
+      deps:
+        - src/phonemize.py
+        - data/manifests/${item}/clean.jsonl
+        - params.yaml
+      params:
+        - languages
+      outs:
+        - data/manifests/${item}/clean.jsonl:
+            cache: false
+
+  # ------------------------------------------------------------------ #
+  # Stage 3 – Add Gaussian noise at each SNR level                      #
+  # ------------------------------------------------------------------ #
+  add_noise:
+    foreach: ${languages}
+    do:
+      cmd: python src/add_noise.py --lang ${item} --params params.yaml
+      deps:
+        - src/add_noise.py
+        - data/manifests/${item}/clean.jsonl
+        - params.yaml
+      params:
+        - snr_levels
+        - seed
+      outs:
+        - data/noisy/${item}
+        - data/manifests/${item}:
+            cache: false
+
+  # ------------------------------------------------------------------ #
+  # Stage 4 – Phoneme inference                                         #
+  # ------------------------------------------------------------------ #
+  inference:
+    foreach: ${languages}
+    do:
+      cmd: python src/run_inference.py --lang ${item} --params params.yaml
+      deps:
+        - src/run_inference.py
+        - data/manifests/${item}
+        - params.yaml
+      params:
+        - model
+      outs:
+        - data/predictions/${item}
+
+  # ------------------------------------------------------------------ #
+  # Stage 5 – Evaluate PER                                              #
+  # ------------------------------------------------------------------ #
+  evaluate:
+    foreach: ${languages}
+    do:
+      cmd: python src/evaluate.py --lang ${item} --params params.yaml
+      deps:
+        - src/evaluate.py
+        - data/predictions/${item}
+        - params.yaml
+      outs:
+        - data/metrics/${item}/per.json:
+            cache: false
+      metrics:
+        - data/metrics/${item}/per.json:
+            cache: false
+
+  # ------------------------------------------------------------------ #
+  # Stage 6 – Plot PER vs SNR                                           #
+  # ------------------------------------------------------------------ #
+  plot:
+    cmd: python src/plot_results.py --params params.yaml
+    deps:
+      - src/plot_results.py
+      - params.yaml
+    outs:
+      - data/figures/per_vs_snr.png:
+            cache: false
+    plots:
+      - data/figures/per_vs_snr.png
