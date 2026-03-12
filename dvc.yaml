@@ -107,9 +107,6 @@ stages:
         - src/evaluate.py
         - data/predictions/${item}
         - params.yaml
-      outs:
-        - data/metrics/${item}/per.json:
-            cache: false
       metrics:
         - data/metrics/${item}/per.json:
             cache: false
@@ -122,8 +119,5 @@ stages:
     deps:
       - src/plot_results.py
       - params.yaml
-    outs:
-      - data/figures/per_vs_snr.png:
-          cache: false
     plots:
       - data/figures/per_vs_snr.png
