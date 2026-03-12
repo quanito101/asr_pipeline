@@ -22,8 +22,10 @@ import json
 import sys
 from pathlib import Path
 
-import torchaudio
 import torch
+import torchaudio
+import soundfile as sf
+import numpy as np
 import yaml
 from tqdm import tqdm
 
@@ -66,8 +68,11 @@ def save_wav(audio_array, sr: int, dst: Path, target_sr: int = 16000) -> float:
         resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
         waveform = resampler(waveform)
 
-    torchaudio.save(str(dst), waveform, target_sr)
-    return waveform.shape[1] / target_sr
+    # Use soundfile to avoid torchcodec dependency
+    audio_np = waveform.squeeze(0).numpy()
+    sf.write(str(dst), audio_np, target_sr, subtype="PCM_16")
+
+    return audio_np.shape[0] / target_sr
 
 
 # --------------------------------------------------------------------------- #
@@ -157,7 +162,7 @@ def main():
         print("ERROR: No utterances saved. Check your internet connection.")
         sys.exit(1)
 
-    tmp_manifest.rename(final_manifest)
+    tmp_manifest.replace(final_manifest)
     print(f"\n[{lang}] Done! Manifest: {final_manifest}  ({count} entries)")
 
 
