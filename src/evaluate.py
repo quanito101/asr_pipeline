@@ -42,7 +42,7 @@ def token_error_rate(ref: list, hyp: list) -> float:
             else:
                 new_dp[j] = 1 + min(dp[j], new_dp[j - 1], dp[j - 1])
         dp = new_dp
-    return dp[n] / n
+    return dp[m] / n
 
 
 def compute_per(ref_phon: str, hyp_phon: str) -> float:
