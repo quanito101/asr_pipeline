@@ -15,7 +15,9 @@ stages:
         - data
         - model.target_sr
       outs:
-        - data/manifests/${item}/clean.jsonl
+        - data/raw/${item}
+        - data/manifests/${item}/clean.jsonl:
+            cache: false
 
   # ------------------------------------------------------------------ #
   # Stage 2 – Phonemize reference transcriptions                        #
@@ -47,7 +49,25 @@ stages:
         - seed
       outs:
         - data/noisy/${item}
-        - data/manifests/${item}:
+        - data/manifests/${item}/noisy_snrm5.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp0.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp5.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp10.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp15.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp20.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp25.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp30.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp35.jsonl:
+            cache: false
+        - data/manifests/${item}/noisy_snrp40.jsonl:
             cache: false
 
   # ------------------------------------------------------------------ #
@@ -59,7 +79,17 @@ stages:
       cmd: python src/run_inference.py --lang ${item} --params params.yaml
       deps:
         - src/run_inference.py
-        - data/manifests/${item}
+        - data/manifests/${item}/clean.jsonl
+        - data/manifests/${item}/noisy_snrm5.jsonl
+        - data/manifests/${item}/noisy_snrp0.jsonl
+        - data/manifests/${item}/noisy_snrp5.jsonl
+        - data/manifests/${item}/noisy_snrp10.jsonl
+        - data/manifests/${item}/noisy_snrp15.jsonl
+        - data/manifests/${item}/noisy_snrp20.jsonl
+        - data/manifests/${item}/noisy_snrp25.jsonl
+        - data/manifests/${item}/noisy_snrp30.jsonl
+        - data/manifests/${item}/noisy_snrp35.jsonl
+        - data/manifests/${item}/noisy_snrp40.jsonl
         - params.yaml
       params:
         - model
