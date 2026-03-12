@@ -30,9 +30,6 @@ stages:
         - params.yaml
       params:
         - languages
-      outs:
-        - data/manifests/${item}/clean.jsonl:
-            cache: false
 
   # ------------------------------------------------------------------ #
   # Stage 3 – Add Gaussian noise at each SNR level                      #
@@ -97,6 +94,6 @@ stages:
       - params.yaml
     outs:
       - data/figures/per_vs_snr.png:
-            cache: false
+          cache: false
     plots:
       - data/figures/per_vs_snr.png
