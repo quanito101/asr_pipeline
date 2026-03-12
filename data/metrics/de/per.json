@@ -1,0 +1,60 @@
+{
+  "lang": "de",
+  "results": [
+    {
+      "snr_db": null,
+      "per": 0.1822,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": -5,
+      "per": 0.8799,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 0,
+      "per": 0.8526,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 5,
+      "per": 0.658,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 10,
+      "per": 0.4221,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 15,
+      "per": 0.2905,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 20,
+      "per": 0.221,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 25,
+      "per": 0.1962,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 30,
+      "per": 0.1884,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 35,
+      "per": 0.1842,
+      "n_utterances": 200
+    },
+    {
+      "snr_db": 40,
+      "per": 0.184,
+      "n_utterances": 200
+    }
+  ]
+}
