@@ -2,8 +2,10 @@
 """
 Stage 5 – Compute Phoneme Error Rate (PER) for each prediction manifest.
 
-PER = (S + D + I) / N  — normalised token-level edit distance.
-Treated as token-level where each space-separated symbol is one phoneme.
+PER = (S + D + I) / N  — normalised character-level edit distance on IPA.
+Both ref_phon and hyp_phon are normalised to bare IPA characters (stress
+marks and spaces stripped) before comparison, making this equivalent to CER
+as suggested in the lab handout.
 
 Reads:  data/predictions/{lang}/*.jsonl
 Writes: data/metrics/{lang}/per.json
@@ -18,6 +20,7 @@ Requirements:
 import argparse
 import json
 import sys
+import unicodedata
 from pathlib import Path
 
 import yaml
@@ -27,6 +30,24 @@ from tqdm import tqdm
 # --------------------------------------------------------------------------- #
 # PER computation                                                              #
 # --------------------------------------------------------------------------- #
+
+def normalize_phon(s: str) -> list:
+    """
+    Strip stress marks, combining diacritics, spaces and punctuation,
+    returning a list of bare IPA characters for edit-distance comparison.
+    """
+    out = []
+    for ch in s:
+        cat = unicodedata.category(ch)
+        # Skip: spaces, modifier letters (stress ˈˌ), combining marks,
+        # punctuation, hyphens, underscores
+        if ch in (' ', '-', '_', '.', "'"):
+            continue
+        if cat in ('Lm', 'Mn', 'Po', 'Pd', 'Sk', 'Zs'):
+            continue
+        out.append(ch)
+    return out
+
 
 def token_error_rate(ref: list, hyp: list) -> float:
     """Standard DP edit distance normalised by len(ref)."""
@@ -46,8 +67,8 @@ def token_error_rate(ref: list, hyp: list) -> float:
 
 
 def compute_per(ref_phon: str, hyp_phon: str) -> float:
-    ref_tokens = ref_phon.strip().split()
-    hyp_tokens = hyp_phon.strip().split()
+    ref_tokens = normalize_phon(ref_phon)
+    hyp_tokens = normalize_phon(hyp_phon)
     if not ref_tokens:
         return 0.0
     return token_error_rate(ref_tokens, hyp_tokens)
