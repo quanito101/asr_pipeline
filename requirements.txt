@@ -1,0 +1,13 @@
+dvc>=3.0
+soundfile
+numpy
+torch
+torchaudio
+transformers
+accelerate
+jiwer
+matplotlib
+pyyaml
+tqdm
+python-dotenv
+datacollective
