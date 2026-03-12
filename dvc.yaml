@@ -120,5 +120,6 @@ stages:
       - src/plot_results.py
       - params.yaml
       - data/metrics/fr/per.json
+      - data/metrics/de/per.json
     plots:
       - data/figures/per_vs_snr.png
